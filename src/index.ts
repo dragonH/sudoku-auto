@@ -45,8 +45,7 @@ const checkValid = (
     gameCellValues: number[][],
     inputNumber: number,
 ) => {
-    const [row, column] = position;// 1, 7
-    // console.log(row, column);
+    const [row, column] = position;
     for (let i = 0; i < 9; i += 1) {
         if (gameCellValues[row][i] === inputNumber && i !== column) {
             return false;
@@ -115,14 +114,28 @@ const solve = async (
 
 (async () => {
     const url = 'https://sudoku.com/';
-    const browser = await puppeteer.launch({ headless: false, defaultViewport: null });
+    const browser = await puppeteer.launch({
+        headless: false,
+        defaultViewport: null,
+        args: [
+            `--window-size=768,768`,
+            `--window-position=0,0`
+        ]
+    });
     const pages = await browser.pages();
     const page = pages.length
         ? pages[0]
         : (await browser.newPage());
+    // await page.setViewport({
+    //     width: 768,
+    //     height:  768,
+    //     deviceScaleFactor: 0.5,
+    // });
     await page.goto(url);
     await page.waitForSelector('.difficulty-menu-select');
     await page.select('.difficulty-menu-select', '/easy/');
+    await sleep(200);
+    await page.click('.cookies-accept');
     await sleep(2000);
     console.log('[Event]: Page loaded');
     const fontList = await page.evaluate(() => window.Font);
